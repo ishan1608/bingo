@@ -1,4 +1,4 @@
-var Game = {
+let Game = {
     init: function() {
         this.data = {};
         // Handles to the html elements
@@ -26,7 +26,6 @@ var Game = {
     },
     
     loadComplete: function() {
-        var self = this;
         // Preparing loaded resources
         this.data.theme = this.queue.getResult('theme');
         this.data.theme.loop = true;
@@ -56,7 +55,7 @@ var Game = {
     
     run: function(data) {
         // Main game loop
-        var gameLoop = function() {
+        const gameLoop = function() {
             Game.input(data);
             Game.update(data);
             Game.render(data);
@@ -78,7 +77,7 @@ var Game = {
         // If user has clicked on a new cell and it is the user's turn
         if (data.clickedCell && data.state.turn) {
             // Check if cell is already clicked
-            var result = _.find(data.state.input.me.concat(data.state.input.opponent), function(cell) {
+            const result = _.find(data.state.input.me.concat(data.state.input.opponent), function(cell) {
                 return cell.x === data.clickedCell.x && cell.y === data.clickedCell.y;
             });
             console.log(result);
