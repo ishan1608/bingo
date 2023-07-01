@@ -36,11 +36,11 @@ winston.log('debug', 'Bingo game server listening on port ' + gameport);
 
 // Serve index.html
 app.get('/', function(req, res) {
-	res.sendFile(__dirname + '/index.html');
+	res.sendFile(__dirname + '/frontend/index.html');
 });
 
 // Serving files in the static folder
-app.use('/static', express.static('static'));
+app.use('/static', express.static('frontend/static'));
 
 // New Socket.io connection
 sio.on('connection', function(client) {
