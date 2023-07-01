@@ -4,13 +4,17 @@ const UUID = require('uuid/v4');
 const http = require('http');
 const express = require('express');
 const io = require('socket.io');
-winston = require('winston');
+const mkdirp = require('mkdirp');
+const winston = require('winston');
+
+// Create logs directory
+mkdirp.sync('logs');
 
 // Configuring winston
 winston.configure({
     transports: [
         new (winston.transports.Console)(),
-        new (winston.transports.File)({ filename: 'default.log' })
+        new (winston.transports.File)({ filename: 'logs/default.log' })
     ]
 });
 winston.level = 'debug';
