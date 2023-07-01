@@ -1,21 +1,22 @@
-var _ = require('underscore');
+const _ = require('underscore');
+const winston = require('winston');
 
 // Number of rows in the board
-var numRows = 5;
-var gameServer = module.exports = {};
+const NUM_ROWS = 5;
+const gameServer = module.exports = {};
 gameServer.rooms = [];
 
-// Generating winning combinations based on numRows
-var winningCombinations = [];
-var generateWinningCombinations = function() {
+// Generating winning combinations based on NUM_ROWS
+const winningCombinations = [];
+const generateWinningCombinations = function() {
     // Two diagonals
-    var diagonal1 = [];
-    var diagonal2 = [];
+    const diagonal1 = [];
+    const diagonal2 = [];
     // Horizontal and Vertical lines
-    for (var i = 0; i < numRows; i++) {
-        var row = [];
-        var col = [];
-        for (var j = 0; j < numRows; j++) {
+    for (let i = 0; i < NUM_ROWS; i++) {
+        const row = [];
+        const col = [];
+        for (let j = 0; j < NUM_ROWS; j++) {
             row.push({
                 x: j,
                 y: i
@@ -33,7 +34,7 @@ var generateWinningCombinations = function() {
             y: i
         });
         diagonal2.push({
-            x: numRows - i - 1,
+            x: NUM_ROWS - i - 1,
             y: i
         });
     }
@@ -43,9 +44,9 @@ var generateWinningCombinations = function() {
 generateWinningCombinations();
 
 // Helper function to get the room from rooms list
-var getRoom = function(roomId) {
+const getRoom = function(roomId) {
     // Find room
-    var room = _.find(gameServer.rooms, function(item) {
+    let room = _.find(gameServer.rooms, function(item) {
         return item.id === roomId;
     });
     // If room doesn't exists create one
@@ -53,7 +54,7 @@ var getRoom = function(roomId) {
         gameServer.rooms.push({
             id: roomId
         });
-    };
+    }
     // Find room again
     room = _.find(gameServer.rooms, function(item) {
         return item.id === roomId;
@@ -62,7 +63,7 @@ var getRoom = function(roomId) {
 }
 
 gameServer.joinRoom = function(roomId) {
-    var room = getRoom(roomId);
+    const room = getRoom(roomId);
     // Create game if it doesn't exists
     if (!_.has(room, 'game')) {
         room.game = {};
@@ -72,8 +73,8 @@ gameServer.joinRoom = function(roomId) {
 
 gameServer.insertClient = function(roomId, player) {
     winston.log('debug', 'insertClient ' + roomId + ' ' + player.type);
-    var room = getRoom(roomId);
-    var game = room.game;
+    const room = getRoom(roomId);
+    const game = room.game;
     if (!_.has(game, 'host')) {
         game.host = player;
         return {
@@ -99,7 +100,7 @@ gameServer.removeClient = function(roomId, player) {
     if (player.type === null) {
         return;
     }
-    var room = getRoom(roomId);
+    const room = getRoom(roomId);
     delete room.game[player.type];
     
     if (player.type === 'host') {
@@ -110,26 +111,26 @@ gameServer.removeClient = function(roomId, player) {
 };
 
 // Helper function which generates the possible list of inputs / numbers
-var generatePossibleInputs = function() {
-    var possibleInputs = [];
-    for (var i = 1; i <= numRows * numRows; i++) {
+const generatePossibleInputs = function() {
+    const possibleInputs = [];
+    for (let i = 1; i <= NUM_ROWS * NUM_ROWS; i++) {
         possibleInputs.push(i);
     }
     return possibleInputs;
 };
 
 // Helper function to create a board with randomly filled numbers
-var createBoard = function() {
+const createBoard = function() {
     // List of all possible inputs / numbers
-    var possibleInputs = generatePossibleInputs();
+    const possibleInputs = generatePossibleInputs();
     // Blank board
-    var board = [];
-    for (var i = 0; i < numRows; i++) {
+    const board = [];
+    for (let i = 0; i < NUM_ROWS; i++) {
         board.push([]);
-        for (var j = 0; j < numRows; j++) {
-            // Insert a random nummber on the board
+        for (let j = 0; j < NUM_ROWS; j++) {
+            // Insert a random number on the board
             board[i].push(possibleInputs[Math.floor(Math.random() * possibleInputs.length)]);
-            var position = possibleInputs.indexOf(board[i][j]);
+            const position = possibleInputs.indexOf(board[i][j]);
             // Remove the inserted number from the list of possible inputs / numbers to avoid duplication
             possibleInputs.splice(position, 1);
         }
@@ -139,9 +140,9 @@ var createBoard = function() {
 
 // Initialize all variables for the room
 gameServer.initializeGame = function(roomId) {
-    var room = getRoom(roomId);
+    const room = getRoom(roomId);
     
-    room.game.numRows = numRows;
+    room.game.numRows = NUM_ROWS;
     // List of all selections made by the players
     room.game.selections = [];
     // Randomly generated board for the two players
@@ -164,7 +165,7 @@ gameServer.initializeGame = function(roomId) {
 // Update the state if players wants to start the game
 gameServer.startGame = function(roomId, player) {
     winston.log('debug', 'startGame ' + roomId + ' ' + player.type);
-    var room = getRoom(roomId);
+    const room = getRoom(roomId);
     // Setting player state as started
     if (player.type === 'host') {
         room.game.state.host = 'started';
@@ -182,18 +183,18 @@ gameServer.startGame = function(roomId, player) {
 
 // Update state to reflect the game has ended
 gameServer.endGame = function(roomId) {
-    var room = getRoom(roomId);
+    const room = getRoom(roomId);
     room.game.state.msg = 'end';
 };
 
 // Process a selection made by the player
 gameServer.playerInput = function(roomId, player, inputNumber) {
     winston.log('debug', 'Player input ' + roomId + ' ' + player.type);
-    var room = getRoom(roomId);
+    const room = getRoom(roomId);
     // Check if input is valid
-    if ((inputNumber > 0) && (inputNumber <= numRows * numRows)) {
+    if ((inputNumber > 0) && (inputNumber <= NUM_ROWS * NUM_ROWS)) {
         // Check if number is already clicked
-        var result = _.find(room.game.selections, function(number) {
+        const result = _.find(room.game.selections, function(number) {
             return number === inputNumber;
         });
         // If number is not already clicked
@@ -201,8 +202,8 @@ gameServer.playerInput = function(roomId, player, inputNumber) {
             // Store newly clicked number information
             room.game.selections.push(inputNumber);
             // Store the board blueprint for host player
-            for (var i = 0; i < numRows; i++) {
-                for (var j = 0; j < numRows; j++) {
+            for (let i = 0; i < NUM_ROWS; i++) {
+                for (let j = 0; j < NUM_ROWS; j++) {
                     if (inputNumber === room.game.boards.host[i][j]) {
                         room.game.boardBluePrint.host.push({
                             x: i,
@@ -214,8 +215,8 @@ gameServer.playerInput = function(roomId, player, inputNumber) {
             }
             
             // Store the board blueprint for client player
-            for (var i = 0; i < numRows; i++) {
-                for (var j = 0; j < numRows; j++) {
+            for (let i = 0; i < NUM_ROWS; i++) {
+                for (let j = 0; j < NUM_ROWS; j++) {
                     if (inputNumber === room.game.boards.client[i][j]) {
                         room.game.boardBluePrint.client.push({
                             x: i,
@@ -238,13 +239,13 @@ gameServer.playerInput = function(roomId, player, inputNumber) {
 
 // Helper function to check the result of the game
 gameServer.checkResult = function(roomId) {
-    var room = getRoom(roomId);
+    const room = getRoom(roomId);
     
     // Helper function to check if all the needles exist in the haystack
-    var containsAll = function(needles, haystack){ 
-        var results = 0;
-        for(var i = 0 , len = needles.length; i < len; i++){
-            for(var j = 0, jlen = haystack.length; j < jlen; j++) {
+    const containsAll = function(needles, haystack){
+        let results = 0;
+        for(let i = 0 , len = needles.length; i < len; i++){
+            for(let j = 0, jlen = haystack.length; j < jlen; j++) {
                 if ((haystack[j].x === needles[i].x) && (haystack[j].y === needles[i].y)) {
                     results += 1;
                 }
@@ -252,33 +253,33 @@ gameServer.checkResult = function(roomId) {
         }
         return results === needles.length;
     };
-    var hostWin = false;
-    var clientWin = false;
+    let hostWin = false;
+    let clientWin = false;
     
     // Check for host win
-    var hostScore = 0;
+    let hostScore = 0;
     _.each(winningCombinations, function(combination) {
         if (containsAll(combination, room.game.boardBluePrint.host) === true) {
             hostScore += 1;
         }
     });
-    hostWin = hostScore >= numRows;
+    hostWin = hostScore >= NUM_ROWS;
     room.game.hostScore =  hostScore;
     winston.log('debug', 'HostWin ' + hostWin);
     winston.log('debug', 'HostScore ' + hostScore);
     winston.log('debug', 'Host board :' + room.game.boards.host);
     winston.log('debug', room.game.boards.host);
-    winston.log('debug', 'Host board blueprint ' + room.game.boardBluePrint.host);
+    winston.log('debug', 'Host board blueprint ' + JSON.stringify(room.game.boardBluePrint.host));
     winston.log('debug', room.game.boardBluePrint.host);
 
     // Check for client win
-    var clientScore = 0;
+    let clientScore = 0;
     _.each(winningCombinations, function(combination) {
         if(containsAll(combination, room.game.boardBluePrint.client) === true) {
             clientScore += 1;
         }
     });
-    clientWin = clientScore >= numRows;
+    clientWin = clientScore >= NUM_ROWS;
     room.game.clientScore = clientScore;
     winston.log('debug', 'ClientWin ' + clientWin);
     winston.log('debug', 'clientScore ' + clientScore);
@@ -302,7 +303,7 @@ gameServer.checkResult = function(roomId) {
 
 // Send the game state to the player
 gameServer.broadcastToPlayer = function(roomId, playerType) {
-    var room = getRoom(roomId);
+    const room = getRoom(roomId);
     
     if (playerType === 'host') {
         // Emit the state to host
@@ -337,7 +338,6 @@ gameServer.broadcastToPlayer = function(roomId, playerType) {
 
 // Send the game state to both the connected players
 gameServer.broadcastGame = function(roomId) {
-    var room = getRoom(roomId);
     winston.log('debug', 'broadcasting game to players ' + roomId);
     
     // Check result
