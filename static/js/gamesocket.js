@@ -1,6 +1,6 @@
-var GameSocket = {
+let GameSocket = {
 	init: function(data) {
-        var self = this;
+        const self = this;
 		// Connect to server for registering player
         data.socket = io.connect('/');
         
@@ -38,7 +38,7 @@ var GameSocket = {
     },
     
     connectToRoom: function(data) {
-        var hash = window.location.hash.substring(1, window.location.hash.length);
+        let hash = window.location.hash.substring(1, window.location.hash.length);
         console.log('hash ' + hash);
         // Hash is the room id
         if (hash !== '') {

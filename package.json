@@ -20,6 +20,7 @@
   "license": "MIT",
   "dependencies": {
     "express": "^4.15.2",
+    "mkdirp": "^1.0.4",
     "socket.io": "^2.0.1",
     "underscore": "^1.12.1",
     "uuid": "^3.0.1",
